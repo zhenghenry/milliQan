@@ -43,5 +43,9 @@ def linearity_test(stepsize, timestep, data_rate, filename):
 				volt = volt - stepsize
 				m.set_DAC(i2c, volt)
 			steps = 0
-	f_output.close()
-	f_input.close()
+
+Timestep = float(sys.argv[2])
+Stepsize = float(sys.argv[1])
+Datarate = float(sys.argv[3])
+file_name = sys.argv[4]
+linearity_test(Stepsize, Timestep, Datarate, file_name)
