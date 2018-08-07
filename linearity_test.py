@@ -18,7 +18,7 @@ def linearity_test(stepsize, timestep, data_rate, filename):
 	steps = 0
 	increasing = True
 	timestamp = 0
-	while(int(volt) < 52428):
+	while(int(volt) < int(0xFFF0) - 1):
 		adc_output = m.read_ADC()
 		f_output = open(filename + "_output.txt", "w+")
 		f_input = open(filename + "_input.txt", "w+")
@@ -32,7 +32,7 @@ def linearity_test(stepsize, timestep, data_rate, filename):
 		timestamp = timestamp + data_rate
 		sleep(data_rate)
 		if steps == int(timestep/data_rate):
-			if int(volt) > 52428 - stepsize - 1:
+			if int(volt) > int(0xFFF0) - stepsize - 1:
 				increasing = False
 			if int(volt) < stepsize + 1:
 				break
