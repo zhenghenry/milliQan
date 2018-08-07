@@ -10,7 +10,18 @@ def set_DAC(i2c, voltage):
 
 def read_ADC():
 	f = os.popen("cat /sys/bus/iio/devices/iio:device0/in_voltage8_vpvn_raw")
-	voltage = float(f.read().split('\n')[0])/4096
+	voltage = float(f.read().split('\n')[0])
 	print(voltage)
+	f.close()
 	return voltage
-
+def read_Temp():
+	f = os.popen("cat /sus/bus/iio/devices/iio:device0/in_temp0_raw")
+	raw_temp = float(f.read().split('\n')[0])
+	f.close()
+	f = os.popen("cat /sus/bus/iio/devices/iio:device0/in_temp0_scale")
+	scale_temp = float(f.read().split('\n')[0])
+	f.close()
+	f = os.popen("cat /sus/bus/iio/devices/iio:device0/in_temp0_offset")
+	offset_temp = float(f.read().split('\n')[0])
+	f.close()
+	return (raw_temp + offset_temp)*scale_temp
