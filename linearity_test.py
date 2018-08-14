@@ -1,4 +1,6 @@
-import main.py as m
+import main as m
+import os
+import sys
 from time import sleep
 from periphery import I2C
 from time import clock
@@ -18,10 +20,10 @@ def linearity_test(stepsize, timestep, data_rate, filename):
 	steps = 0
 	increasing = True
 	timestamp = 0
-	while(int(volt) < int(0xFFF0) - 1):
+	f_output = open(filename + "_output.txt", "w+")
+	f_input = open(filename + "_input.txt", "w+")
+	while(int(volt) < int(0x7ff0) + stepsize):
 		adc_output = m.read_ADC()
-		f_output = open(filename + "_output.txt", "w+")
-		f_input = open(filename + "_input.txt", "w+")
 		f_output.write("%0.2f, %0.2f\n"%(adc_output, timestamp))
 		f_input.write("%0.2f\n"%(float(volt)*1.25/(2.**15)))
 		f_output.flush()
@@ -32,16 +34,17 @@ def linearity_test(stepsize, timestep, data_rate, filename):
 		timestamp = timestamp + data_rate
 		sleep(data_rate)
 		if steps == int(timestep/data_rate):
-			if int(volt) > int(0xFFF0) - stepsize - 1:
+			if int(volt) > int(0x7ff0) - stepsize - 1:
+				print("Maximum Value Reached \n")
 				increasing = False
-			if int(volt) < stepsize + 1:
-				break
 			if increasing == True:
 				volt = volt + stepsize
-				m.set_DAC(i2c, volt)
+				m.set_DAC(i2c, int(volt))
 			if increasing == False:
 				volt = volt - stepsize
-				m.set_DAC(i2c, volt)
+				m.set_DAC(i2c, int(volt))
+			if int(volt) < stepsize - 1:
+				break;
 			steps = 0
 
 Timestep = float(sys.argv[2])
