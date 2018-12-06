@@ -9,29 +9,27 @@ def run(i2c,time,steps,Filename):
 	time = float(time)
 	volt = 0x0000
 	while(int(volt) < 26214):
-		i2c.transfer(0x20,[I2C.Message([0x3F,volt>>8, volt & 0xFF00>>8], read = False)])
+		i2c.transfer(0x11,[I2C.Message([0x3F,volt>>8, volt & 0xFF00>>8], read = False)])
 		volt = volt + steps
-		print('%.2f V' %(float(volt)*1.25/(2.**15)))
 		os.system("cat /sys/bus/iio/devices/iio:device0/in_voltage8_vpvn_raw >>" + Filename + "_output.txt")
-		f.write('%0.2f\n'%(float(volt)*1.25/(2.**15)))
+		f.write('%0.2f\n'%(float(volt)))
 		f.flush()
 		os.fsync(f.fileno())
 		sleep(time)
 		if(int(volt) > 26214 - steps - 1):
 			while(int(volt)>0):
 				volt = volt - steps
-				i2c.transfer(0x20,[I2C.Message([0x3F,volt>>8, volt & 0xFF00>>8], read = False)])
-				print('%.2f V' % (float(volt)*1.25/(2.**15)))
+				i2c.transfer(0x11,[I2C.Message([0x3F,volt>>8, volt & 0xFF00>>8], read = False)])
+				print('%.2f' % (float(volt)))
 				os.system("cat /sys/bus/iio/devices/iio:device0/in_voltage8_vpvn_raw >>" + Filename + "_output.txt")
-				f.write('%0.2f\n'%(float(volt)*1.25/(2.**15)))
+				f.write('%0.2f\n'%(float(volt)))
 				f.flush()
 				os.fsync(f.fileno())
 				sleep(time)
 
 Time = sys.argv[1]
 Time = float(Time)
-Steps = float(sys.argv[2])
-Steps = int(Steps*2.**15/1.25)
+Steps = int(sys.argv[2])
 file_name = sys.argv[3]
 file_list = os.listdir(".")
 txt_list = []
