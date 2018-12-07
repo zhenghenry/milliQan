@@ -25,7 +25,7 @@ def linearity_test(stepsize, timestep, data_rate, filename):
 	while(int(volt) < int(0x7ff0) + stepsize):
 		adc_output = m.read_ADC()
 		f_output.write("%0.2f, %0.2f\n"%(adc_output, timestamp))
-		f_input.write("%0.2f\n"%(float(volt)*1.25/(2.**15)))
+		f_input.write("%0.2f\n"%(float(volt)))
 		f_output.flush()
 		f_input.flush()
 		os.fsync(f_output.fileno())
