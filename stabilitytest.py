@@ -8,7 +8,7 @@ from scipy import optimize
 cycol1 = cycle('bgrcmk')
 cycol2 = cycle('bgrcmk')
 
-filename = 'v5trial'
+filename = 'v6trial'
 outval, time = np.loadtxt(filename + '_output.txt', delimiter = ',', unpack = True)
 outval = outval
 inval = np.loadtxt(filename + '_input.txt', delimiter = ',', unpack = True)
@@ -119,7 +119,7 @@ else:
     ax4.set_title("HV Board DAC and ADC Voltage Stability Test")
     ax4.set_xlabel("DAC Input Value")
     ax4.set_ylabel("Mean ADC Output Valaue (V)")
-    ax4.set_ylim(-0.01,1.)
+    ax4.set_ylim(1400.,2000.)
     ax4.legend()
 
     textfit1 = '$f =  Ax + B$ \n'\
