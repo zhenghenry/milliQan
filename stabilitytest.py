@@ -8,9 +8,9 @@ from scipy import optimize
 cycol1 = cycle('bgrcmk')
 cycol2 = cycle('bgrcmk')
 
-filename = 'v3test'
+filename = 'v5trial'
 outval, time = np.loadtxt(filename + '_output.txt', delimiter = ',', unpack = True)
-outval = outval/4095.
+outval = outval
 inval = np.loadtxt(filename + '_input.txt', delimiter = ',', unpack = True)
 inval = inval
 previnval = 0.
@@ -35,38 +35,38 @@ fig3 = plt.figure()
 ax3 = fig3.add_subplot(111)
 fig4 = plt.figure()
 ax4 = fig4.add_subplot(111)
-for i in range(int(len(inval)/2)):
-	if i > 180:
-		measuredvoltage = np.append(measuredvoltage, outval[i]) 
-		setvoltage = np.append(setvoltage, inval[i])
-		if len(measuredvoltage)%60 == 0:
-			mean = np.mean(measuredvoltage)
-			meanlist = np.append(meanlist, mean)			
-			measureddiff = abs(measuredvoltage - setvoltage)
-			for k in range(60):
-				meandiff = np.append(meandiff, abs(np.mean(measuredvoltage - setvoltage)))
-				means = np.append(means, mean)
-			mse = mean_squared_error(measureddiff,meandiff)			
-			mean_mse = mean_squared_error(measuredvoltage, means)
-			if mean < 0.002 or mse == 0:
-				percentrms = np.append(percentrms, 1.)
-				percentrmse = np.append(percentrmse, 1/60.)
-			else:
-				percentrms = np.append(percentrms, np.sqrt(mse*60.)/mean)
-				percentrmse = np.append(percentrmse, np.sqrt(1/60. + mean**2/mse))			
+for i in range(int(len(inval))):
 
-			ax1.hist(measureddiff - meandiff, bins = 15, alpha = 0.5, color = next(cycol1))
-			ax2.hist(measuredvoltage, bins = 15, color = next(cycol2))
-			if i%360 == 0:
-				ax3.hist(measuredvoltage, bins = 15, color = 'red')
-				print(inval[i])
-			rmse = np.append(rmse, np.sqrt(mse)/abs(np.mean(measuredvoltage - setvoltage)))
-			meansquared = 0
-			measuredvoltage = np.array([])
-			means = np.array([])
-			setvoltage = np.array([])
-			dacval = np.append(dacval, inval[i])
-			meandiff = np.array([])
+	measuredvoltage = np.append(measuredvoltage, outval[i]) 
+	setvoltage = np.append(setvoltage, inval[i])
+	if len(measuredvoltage)%60 == 0:
+		mean = np.mean(measuredvoltage)
+		meanlist = np.append(meanlist, mean)			
+		measureddiff = abs(measuredvoltage - setvoltage)
+		for k in range(60):
+			meandiff = np.append(meandiff, abs(np.mean(measuredvoltage - setvoltage)))
+			means = np.append(means, mean)
+		mse = mean_squared_error(measureddiff,meandiff)			
+		mean_mse = mean_squared_error(measuredvoltage, means)
+		if mean < 0.002 or mse == 0:
+			percentrms = np.append(percentrms, 1.)
+			percentrmse = np.append(percentrmse, 1/60.)
+		else:
+			percentrms = np.append(percentrms, np.sqrt(mse*60.)/mean)
+			percentrmse = np.append(percentrmse, np.sqrt(1/60. + mean**2/mse))			
+
+		ax1.hist(measureddiff - meandiff, bins = 15, alpha = 0.5, color = next(cycol1))
+		ax2.hist(measuredvoltage, bins = 15, color = next(cycol2))
+		if i%360 == 0:
+			ax3.hist(measuredvoltage, bins = 15, color = 'red')
+			print(inval[i])
+		rmse = np.append(rmse, np.sqrt(mse)/abs(np.mean(measuredvoltage - setvoltage)))
+		meansquared = 0
+		measuredvoltage = np.array([])
+		means = np.array([])
+		setvoltage = np.array([])
+		dacval = np.append(dacval, inval[i])
+		meandiff = np.array([])
 yerr_lower = np.zeros(len(dacval))
 yerr_upper = np.zeros(len(dacval))
 for i in range(len(yerr_upper)):
@@ -92,7 +92,7 @@ def residual(p, x, y, dy):
 
 p01 = [1., 1.]
 pf1, cov1, info1, mesg1, success1 = optimize.leastsq(residual, p01,
-                                                     args=(dacval[8:], meanlist[8:], np.sqrt(mean_mse)), full_output=1)
+                                                     args=(dacval, meanlist, np.sqrt(mean_mse)), full_output=1)
 
 if cov1 is None:
     print('Fit did not converge')
@@ -101,7 +101,7 @@ if cov1 is None:
 else:
     print('Fit Converged')
     chisq1 = sum(info1['fvec'] * info1['fvec'])
-    dof1 = len(dacval[8:]) - len(pf1)
+    dof1 = len(dacval) - len(pf1)
     pferr1 = [np.sqrt(cov1[i, i]) for i in range(len(pf1))]
     print('Converged with chi-squared', chisq1)
     print('Number of degrees of freedom, dof =', dof1)
@@ -117,7 +117,7 @@ else:
     f = np.linspace(dacval.min(), dacval.max(), 5000)
     ax4.plot(f, fitfunc(pf1, f), 'r-', label='Fit')
     ax4.set_title("HV Board DAC and ADC Voltage Stability Test")
-    ax4.set_xlabel("DAC Input Value (V)")
+    ax4.set_xlabel("DAC Input Value")
     ax4.set_ylabel("Mean ADC Output Valaue (V)")
     ax4.set_ylim(-0.01,1.)
     ax4.legend()
@@ -136,7 +136,7 @@ else:
 fig5 = plt.figure()
 ax5 = fig5.add_subplot(111)
 ax5.errorbar(dacval, meanlist, yerr = np.sqrt(mean_mse), markersize = 5, capsize = 2, fmt = 'k.') 
-ax5.set_xlabel("DAC Input Value (V)")
+ax5.set_xlabel("DAC Input Value")
 ax5.set_ylabel("Mean ADC Output Valaue (V)")
 ax5.set_title("HV Board DAC and ADC Voltage Stability Test")
 
