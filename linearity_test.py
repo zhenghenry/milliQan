@@ -5,7 +5,7 @@ from time import sleep
 from periphery import I2C
 from time import clock
 
-def linearity_test(stepsize, timestep, data_rate, filename):
+def linearity_test(stepsize, timestep, data_rate, starting_volt, filename):
 	file_list = os.listdir(".")
 	txt_list = []
 	for names in file_list:
@@ -16,7 +16,7 @@ def linearity_test(stepsize, timestep, data_rate, filename):
 	i2c = I2C('/dev/i2c-6')
 	timestep = float(timestep)
 	data_rate = float(data_rate)
-	volt = 0x0000
+	volt = hex(starting_volt)
 	steps = 0
 	increasing = True
 	timestamp = 0
