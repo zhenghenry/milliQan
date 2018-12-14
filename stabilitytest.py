@@ -10,9 +10,11 @@ cycol2 = cycle('bgrcmk')
 
 filename = 'v6trial'
 outval, time = np.loadtxt(filename + '_output.txt', delimiter = ',', unpack = True)
-outval = outval
 inval = np.loadtxt(filename + '_input.txt', delimiter = ',', unpack = True)
-inval = inval
+inval = inval*1.25/2**15
+inval = inval[15960:39300]
+outval = outval[15960:39300]
+time = time[15960:39300]
 previnval = 0.
 measuredvoltage = np.array([])
 setvoltage = np.array([])
@@ -31,17 +33,17 @@ fig1 = plt.figure()
 ax1 = fig1.add_subplot(111)
 fig2 = plt.figure()
 ax2 = fig2.add_subplot(111)
-fig3 = plt.figure()
-ax3 = fig3.add_subplot(111)
+
 fig4 = plt.figure()
 ax4 = fig4.add_subplot(111)
-for i in range(int(len(inval))):
 
+for i in range(int(len(inval))):
 	measuredvoltage = np.append(measuredvoltage, outval[i]) 
 	setvoltage = np.append(setvoltage, inval[i])
 	if len(measuredvoltage)%60 == 0:
 		mean = np.mean(measuredvoltage)
-		meanlist = np.append(meanlist, mean)			
+		meanlist = np.append(meanlist, mean)	
+		print(mean)		
 		measureddiff = abs(measuredvoltage - setvoltage)
 		for k in range(60):
 			meandiff = np.append(meandiff, abs(np.mean(measuredvoltage - setvoltage)))
@@ -57,9 +59,6 @@ for i in range(int(len(inval))):
 
 		ax1.hist(measureddiff - meandiff, bins = 15, alpha = 0.5, color = next(cycol1))
 		ax2.hist(measuredvoltage, bins = 15, color = next(cycol2))
-		if i%360 == 0:
-			ax3.hist(measuredvoltage, bins = 15, color = 'red')
-			print(inval[i])
 		rmse = np.append(rmse, np.sqrt(mse)/abs(np.mean(measuredvoltage - setvoltage)))
 		meansquared = 0
 		measuredvoltage = np.array([])
@@ -78,9 +77,6 @@ ax2.set_xlabel("ADC Output Voltage (V)")
 ax2.set_ylabel("Counts")
 ax1.set_title("ADC Output Histogram Centered")
 ax2.set_title("ADC Output Histogram")
-ax3.set_title("ADC Output Histogram")
-ax3.set_xlabel("ADC Output Voltage(V)")
-ax3.set_ylabel("Counts")
 
 def fitfunc(p, x):
     return p[0] * x + p[1]
@@ -117,7 +113,7 @@ else:
     f = np.linspace(dacval.min(), dacval.max(), 5000)
     ax4.plot(f, fitfunc(pf1, f), 'r-', label='Fit')
     ax4.set_title("HV Board DAC and ADC Voltage Stability Test")
-    ax4.set_xlabel("DAC Input Value")
+    ax4.set_xlabel("DAC Input Voltage(V)")
     ax4.set_ylabel("Mean ADC Output Valaue (V)")
     ax4.set_ylim(1400.,2000.)
     ax4.legend()
@@ -128,18 +124,17 @@ else:
                '$N = %i$ (dof) \n'\
                '$\chi^2/N = % .2f$' % ( pf1[0], pferr1[0],pf1[1], pferr1[1],  dof1,
                 chisq1 / dof1)
-    ax4.text(0.1, .8, textfit1, transform=ax4.transAxes, fontsize=12,
+    ax4.text(0.1, .4, textfit1, transform=ax4.transAxes, fontsize=12,
              verticalalignment='top')
     #ax1.set_xlim([1e-6, 7*1e-6])
     plt.show()
 
 fig5 = plt.figure()
 ax5 = fig5.add_subplot(111)
-ax5.errorbar(dacval, meanlist, yerr = np.sqrt(mean_mse), markersize = 5, capsize = 2, fmt = 'k.') 
-ax5.set_xlabel("DAC Input Value")
+ax5.errorbar(time, outval, yerr = np.sqrt(mean_mse), markersize = 5, capsize = 2, fmt = 'k.') 
+ax5.set_xlabel("DAC Input Voltage (V)")
 ax5.set_ylabel("Mean ADC Output Valaue (V)")
 ax5.set_title("HV Board DAC and ADC Voltage Stability Test")
-
 
 plt.show()
 plt.close('all')
