@@ -5,17 +5,11 @@ import matplotlib.colors as c
 from itertools import cycle
 from scipy import optimize
 
-cycol1 = cycle('bgrcmk')
-cycol2 = cycle('bgrcmk')
 
-filename = 'v6trial'
+filename = sys.argv[1]
 outval, time = np.loadtxt(filename + '_output.txt', delimiter = ',', unpack = True)
 inval = np.loadtxt(filename + '_input.txt', delimiter = ',', unpack = True)
-inval = inval*1.25/2**15
-inval = inval[15960:39300]
-outval = outval[15960:39300]
-time = time[15960:39300]
-previnval = 0.
+
 measuredvoltage = np.array([])
 setvoltage = np.array([])
 rmse = np.array([])
@@ -138,4 +132,3 @@ ax5.set_title("HV Board DAC and ADC Voltage Stability Test")
 
 plt.show()
 plt.close('all')
-
