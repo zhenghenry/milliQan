@@ -5,11 +5,7 @@ from time import sleep
 from periphery import I2C
 from time import clock
 
-<<<<<<< HEAD
 def linearity_test(stepsize, timestep, data_rate,  filename):
-=======
-def linearity_test(stepsize, timestep, data_rate, starting_volt, filename):
->>>>>>> 065c7fd66078c52914cd7779a1cea0145a331196
 	file_list = os.listdir(".")
 	txt_list = []
 	for names in file_list:
@@ -20,7 +16,7 @@ def linearity_test(stepsize, timestep, data_rate, starting_volt, filename):
 	i2c = I2C('/dev/i2c-6')
 	timestep = float(timestep)
 	data_rate = float(data_rate)
-	volt = hex(starting_volt)
+	volt = 0x0000
 	steps = 0
 	increasing = True
 	timestamp = 0
@@ -37,6 +33,7 @@ def linearity_test(stepsize, timestep, data_rate, starting_volt, filename):
 		steps += 1
 		timestamp = timestamp + data_rate
 		sleep(data_rate)
+		print(volt)
 		if steps == int(timestep/data_rate):
 			if int(volt) > int(0xFFF0) - stepsize - 1:
 				print("Maximum Value Reached \n")
